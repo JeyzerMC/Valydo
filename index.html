@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=2.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Marker Clustering</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 60%;
+        width: 70%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 1;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1> Carte </h1>
+    <script src="jquery-3.1.1.min.js"></script>
+    <div id="map"></div>
+    <script>
+
+      var url = "http://donnees.ville.montreal.qc.ca/dataset/2980db3a-9eb4-4c0e-b7c6-a6584cb769c9/resource/18705524-c8a6-49a0-bca7-92f493e6d329/download/oeuvresdonneesouvertes.json";
+      var items = [];
+      var locations = [];
+      var names = [];
+      var markers = [];
+      var windows = [];
+
+      $.getJSON( url, function( data ) {
+        $.each( data, function( key, val ) {
+          items.push([key,data]);
+          locations.push({lat:parseFloat( val.CoordonneeLatitude),lng:parseFloat( val.CoordonneeLongitude)});
+          names.push(val.Titre)
+        });
+
+      });
+
+
+      function initMap() {
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 10,
+          center: {lat: 45.507102, lng: -73.587407}
+        });
+
+
+
+        // Create an array of alphabetical characters used to label the markers.
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+
+        // Add some markers to the map.
+        // Note: The code uses the JavaScript Array.prototype.map() method to
+        // create an array of markers based on a given "locations" array.
+        // The map() method here has nothing to do with the Google Maps API.
+        markers = locations.map(function(location, i) {
+          return new google.maps.Marker({
+            position: location,
+            label: labels[i % labels.length]
+          });
+        });
+
+        for(var i = 0; i < items.lengh; i++){
+          console.log(items[i]);
+        }
+
+        for(var i = 0; i < markers.length; i++){
+          markers[i].addListener('click', function() {
+              infowindow.open(map, marker);
+          });
+        }
+
+        // Add a marker clusterer to manage the markers.
+        var markerCluster = new MarkerClusterer(map, markers,
+            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
+      }
+
+
+
+    </script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBDlTGj5MTEcqcRhUiw4YM-P5ORMxBILj0&callback=initMap">
+    </script>
+  </body>
+</html>
